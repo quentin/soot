@@ -43,8 +43,8 @@ public class CombinedDUAnalysis extends BackwardFlowAnalysis implements Combined
         return ret;
     }
     private final Map<Unit, List> usesOf = new HashMap<Unit, List>();
-    public List getUsesOf(Unit u) {
-        List ret = usesOf.get(u);
+    public List<UnitValueBoxPair> getUsesOf(Unit u) {
+        List<UnitValueBoxPair> ret = usesOf.get(u);
         if( ret == null ) {
             Local def = localDefed(u);
             if( def == null ) {
