@@ -109,7 +109,7 @@ public class DirectedCallGraph implements DirectedGraph {
 	    }
 	    remain = newRemain;
 	}
-	G.v().out.println("[AM] number of methods to be analysed: "+nb);
+	if(verbose) G.v().out.println("[AM] number of methods to be analysed: "+nb);
 
 	// MultiMap -> Map of List
 	this.succ   = new HashMap();
