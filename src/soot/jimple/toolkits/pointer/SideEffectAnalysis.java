@@ -38,7 +38,7 @@ public class SideEffectAnalysis {
 	
 	MethodRWSet read = null;
 	MethodRWSet write = null;
-	for( Iterator sIt = method.retrieveActiveBody().getUnits().iterator(); sIt.hasNext(); ) {
+	for( Iterator<Unit> sIt = method.retrieveActiveBody().getUnits().iterator(); sIt.hasNext(); ) {
 	    final Stmt s = (Stmt) sIt.next();
             RWSet ntr = ntReadSet( method, s );
             if( ntr != null ) {

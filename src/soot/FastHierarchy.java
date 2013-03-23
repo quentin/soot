@@ -32,9 +32,9 @@ import java.util.*;
  */
 public class FastHierarchy
 {
-    private static void put( Map<Object, List> m, Object key, Object value ) {
-        List<Object> l = m.get( key );
-        if( l == null ) m.put( key, l = new ArrayList<Object>() );
+    private static <K,V> void put( Map<K, List<V>> m, K key, V value ) {
+        List<V> l = m.get( key );
+        if( l == null ) m.put( key, l = new ArrayList<V>() );
         l.add( value );
     }
     
@@ -42,7 +42,7 @@ public class FastHierarchy
      * value.getSuperclass() == key. This is one of the three maps that hold
      * the inverse of the relationships given by the getSuperclass and
      * getInterfaces methods of SootClass. */
-    protected Map<Object, List> classToSubclasses = new HashMap<Object, List>();
+    protected Map<SootClass, List<SootClass>> classToSubclasses = new HashMap<SootClass, List<SootClass>>();
 
     /** This map holds all key,value pairs such that value is an interface 
      * and key is in value.getInterfaces(). This is one of the three maps 
@@ -88,11 +88,11 @@ public class FastHierarchy
     protected int dfsVisit( int start, SootClass c ) {
         Interval r = new Interval();
         r.lower = start++;
-        Collection col = classToSubclasses.get(c);
+        Collection<SootClass> col = classToSubclasses.get(c);
         if( col != null ) {
-            Iterator it = col.iterator();
+            Iterator<SootClass> it = col.iterator();
             while( it.hasNext() ) {
-                SootClass sc = (SootClass) it.next();
+                SootClass sc = it.next();
                 // For some awful reason, Soot thinks interface are subclasses
                 // of java.lang.Object
                 if( sc.isInterface() ) continue;
@@ -114,14 +114,14 @@ public class FastHierarchy
         this.sc = Scene.v();
 
         /* First build the inverse maps. */
-        for( Iterator clIt = sc.getClasses().iterator(); clIt.hasNext(); ) {
-            final SootClass cl = (SootClass) clIt.next();
+        for( Iterator<SootClass> clIt = sc.getClasses().iterator(); clIt.hasNext(); ) {
+            final SootClass cl = clIt.next();
             if( cl.resolvingLevel() < SootClass.HIERARCHY ) continue;
             if( !cl.isInterface() && cl.hasSuperclass() ) {
                 put( classToSubclasses, cl.getSuperclass(), cl );
             }
-            for( Iterator superclIt = cl.getInterfaces().iterator(); superclIt.hasNext(); ) {
-                final SootClass supercl = (SootClass) superclIt.next();
+            for( Iterator<SootClass> superclIt = cl.getInterfaces().iterator(); superclIt.hasNext(); ) {
+                final SootClass supercl = superclIt.next();
                 if( cl.isInterface() ) {
                     interfaceToSubinterfaces.put( supercl, cl );
                 } else {
@@ -153,11 +153,11 @@ public class FastHierarchy
 
     /** For an interface parent (MUST be an interface), returns set of all
      * implementers of it but NOT their subclasses. */
-    public Set getAllImplementersOfInterface( SootClass parent ) {
+    public Set<SootClass> getAllImplementersOfInterface( SootClass parent ) {
         parent.checkLevel(SootClass.HIERARCHY);
         if( !interfaceToAllImplementers.containsKey( parent ) ) {
-            for( Iterator subinterfaceIt = getAllSubinterfaces( parent ).iterator(); subinterfaceIt.hasNext(); ) {
-                final SootClass subinterface = (SootClass) subinterfaceIt.next();
+            for( Iterator<SootClass> subinterfaceIt = getAllSubinterfaces( parent ).iterator(); subinterfaceIt.hasNext(); ) {
+                final SootClass subinterface = subinterfaceIt.next();
                 if( subinterface == parent ) continue;
                 interfaceToAllImplementers.putAll(parent,
                     getAllImplementersOfInterface( subinterface ) );
@@ -170,13 +170,13 @@ public class FastHierarchy
 
     /** For an interface parent (MUST be an interface), returns set of all
      * subinterfaces. */
-    protected Set getAllSubinterfaces( SootClass parent ) {
+    protected Set<SootClass> getAllSubinterfaces( SootClass parent ) {
         parent.checkLevel(SootClass.HIERARCHY);
         if( !interfaceToAllSubinterfaces.containsKey( parent ) ) {
             interfaceToAllSubinterfaces.put( parent, parent );
-            for( Iterator it = interfaceToSubinterfaces.get( parent ).iterator(); it.hasNext(); ) {
+            for( Iterator<SootClass> it = interfaceToSubinterfaces.get( parent ).iterator(); it.hasNext(); ) {
                 interfaceToAllSubinterfaces.putAll(parent, 
-                    getAllSubinterfaces( (SootClass) it.next() ) );
+                    getAllSubinterfaces(it.next() ) );
             }
         }
         return interfaceToAllSubinterfaces.get( parent );
@@ -229,7 +229,7 @@ public class FastHierarchy
             } else {
                 SootClass base = ((AnySubType)child).getBase().getSootClass();
                 SootClass parentClass = ((RefType) parent).getSootClass();
-                LinkedList worklist = new LinkedList();
+                LinkedList<SootClass> worklist = new LinkedList<SootClass>();
                 if( base.isInterface() ) worklist.addAll(getAllImplementersOfInterface(base));
                 else worklist.add(base);
                 Set<SootClass> workset = new HashSet<SootClass>();
@@ -292,8 +292,8 @@ public class FastHierarchy
                 return getAllSubinterfaces( parent ).contains( child );
             }
         } else {
-            Set impl = getAllImplementersOfInterface( parent );
-            for( Iterator it = impl.iterator(); it.hasNext(); ) {
+            Set<SootClass> impl = getAllImplementersOfInterface( parent );
+            for( Iterator<SootClass> it = impl.iterator(); it.hasNext(); ) {
                 parentInterval = classToInterval.get( it.next() );
                 if( parentInterval != null && parentInterval.isSubrange( childInterval ) ) {
                     return true;
@@ -303,19 +303,19 @@ public class FastHierarchy
         }
     }
 
-    public Collection<SootMethod> resolveConcreteDispatchWithoutFailing(Collection concreteTypes, SootMethod m, RefType declaredTypeOfBase ) {
+    public Collection<SootMethod> resolveConcreteDispatchWithoutFailing(Collection<Type> concreteTypes, SootMethod m, RefType declaredTypeOfBase ) {
 
         Set<SootMethod> ret = new HashSet<SootMethod>();
         SootClass declaringClass = declaredTypeOfBase.getSootClass();
         declaringClass.checkLevel(SootClass.HIERARCHY);
-        for( Iterator tIt = concreteTypes.iterator(); tIt.hasNext(); ) {
-            final Type t = (Type) tIt.next();
+        for( Iterator<Type> tIt = concreteTypes.iterator(); tIt.hasNext(); ) {
+            final Type t = tIt.next();
             if( t instanceof AnySubType ) {
                 String methodSig = m.getSubSignature();
-                HashSet s = new HashSet();
+                HashSet<SootClass> s = new HashSet<SootClass>();
                 s.add( declaringClass );
                 while( !s.isEmpty() ) {
-                    SootClass c = (SootClass) s.iterator().next();
+                    SootClass c = s.iterator().next();
                     s.remove( c );
                     if( !c.isInterface() && !c.isAbstract()
                             && canStoreClass( c, declaringClass ) ) {
@@ -361,19 +361,19 @@ public class FastHierarchy
         return ret;
     }
 
-    public Collection<SootMethod> resolveConcreteDispatch(Collection concreteTypes, SootMethod m, RefType declaredTypeOfBase ) {
+    public Collection<SootMethod> resolveConcreteDispatch(Collection<Type> concreteTypes, SootMethod m, RefType declaredTypeOfBase ) {
 
         Set<SootMethod> ret = new HashSet<SootMethod>();
         SootClass declaringClass = declaredTypeOfBase.getSootClass();
         declaringClass.checkLevel(SootClass.HIERARCHY);
-        for( Iterator tIt = concreteTypes.iterator(); tIt.hasNext(); ) {
-            final Type t = (Type) tIt.next();
+        for( Iterator<Type> tIt = concreteTypes.iterator(); tIt.hasNext(); ) {
+            final Type t = tIt.next();
             if( t instanceof AnySubType ) {
                 String methodSig = m.getSubSignature();
-                HashSet s = new HashSet();
+                HashSet<SootClass> s = new HashSet<SootClass>();
                 s.add( declaringClass );
                 while( !s.isEmpty() ) {
-                    SootClass c = (SootClass) s.iterator().next();
+                    SootClass c = s.iterator().next();
                     s.remove( c );
                     if( !c.isInterface() && !c.isAbstract()
                             && canStoreClass( c, declaringClass ) ) {
@@ -434,16 +434,16 @@ public class FastHierarchy
         String methodSig = m.getSubSignature();
         HashSet<SootClass> resolved = new HashSet<SootClass>();
         HashSet<SootMethod> ret = new HashSet<SootMethod>();
-        LinkedList worklist = new LinkedList();
+        LinkedList<SootClass> worklist = new LinkedList<SootClass>();
         worklist.add( abstractType );
         while( !worklist.isEmpty() ) {
-            SootClass concreteType = (SootClass) worklist.removeFirst();
+            SootClass concreteType = worklist.removeFirst();
             SootClass savedConcreteType = concreteType;
             if( concreteType.isInterface() ) {
                 worklist.addAll( getAllImplementersOfInterface( concreteType ) );
                 continue;
             }
-            Collection c = classToSubclasses.get( concreteType );
+            Collection<SootClass> c = classToSubclasses.get( concreteType );
             if( c != null ) worklist.addAll( c );
             if( !concreteType.isAbstract() ) {
                 while( true ) {
@@ -513,9 +513,9 @@ public class FastHierarchy
             return target;
     }
 
-    public Collection getSubclassesOf( SootClass c ) {
+    public Collection<SootClass> getSubclassesOf( SootClass c ) {
         c.checkLevel(SootClass.HIERARCHY);
-        Collection ret = classToSubclasses.get(c);
+        Collection<SootClass> ret = classToSubclasses.get(c);
         if( ret == null ) return Collections.EMPTY_LIST;
         return ret;
     }

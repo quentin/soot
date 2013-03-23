@@ -180,7 +180,7 @@ public class JAssignStmt extends AbstractDefinitionStmt
 	    return rightBox;
     }
 
-    public List getUnitBoxes()
+    public List<UnitBox> getUnitBoxes()
     {
         // handle possible PhiExpr's
         Value rValue = rightBox.getValue();

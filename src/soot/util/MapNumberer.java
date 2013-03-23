@@ -20,21 +20,21 @@
 package soot.util;
 import java.util.*;
 
-public class MapNumberer implements Numberer {
-    Map<Object, Integer> map = new HashMap<Object, Integer>();
-    ArrayList<Object> al = new ArrayList<Object>();
+public class MapNumberer<E> implements Numberer<E> {
+    Map<E, Integer> map = new HashMap<E, Integer>();
+    ArrayList<E> al = new ArrayList<E>();
     int nextIndex = 1;
-    public void add( Object o ) {
+    public void add( E o ) {
         if( !map.containsKey(o) ) {
             map.put( o, new Integer(nextIndex) );
             al.add(o);
             nextIndex++;
         }
     }
-    public Object get( long number ) {
+    public E get( long number ) {
         return al.get((int) number);
     }
-    public long get( Object o ) {
+    public long get( E o ) {
         if( o == null ) return 0;
         Integer i = map.get(o);
         if( i == null ) throw new RuntimeException( "couldn't find "+o );
@@ -42,5 +42,5 @@ public class MapNumberer implements Numberer {
     }
     public int size() { return nextIndex-1; /*subtract 1 for null*/ }
     public MapNumberer() { al.add(null); }
-    public boolean contains(Object o) { return map.containsKey(o); }
+    public boolean contains(E o) { return map.containsKey(o); }
 }

@@ -62,6 +62,7 @@ import soot.util.MapNumberer;
 import soot.util.Numberer;
 import soot.util.SingletonList;
 import soot.util.StringNumberer;
+import soot.jimple.spark.pag.SparkField;
 
 import org.xmlpull.v1.XmlPullParser;
 import android.content.res.AXmlResourceParser;
@@ -122,15 +123,15 @@ public class Scene  //extends AbstractHost
     
     private final Map<String,Type> nameToClass = new HashMap<String,Type>();
 
-    ArrayNumberer kindNumberer = new ArrayNumberer();
-    ArrayNumberer typeNumberer = new ArrayNumberer();
-    ArrayNumberer methodNumberer = new ArrayNumberer();
-    Numberer unitNumberer = new MapNumberer();
+    ArrayNumberer<Kind> kindNumberer = new ArrayNumberer<Kind>();
+    ArrayNumberer<Type> typeNumberer = new ArrayNumberer<Type>();
+    ArrayNumberer<SootMethod> methodNumberer = new ArrayNumberer<SootMethod>();
+    Numberer<Unit> unitNumberer = new MapNumberer<Unit>();
     Numberer contextNumberer = null;
-    ArrayNumberer fieldNumberer = new ArrayNumberer();
-    ArrayNumberer classNumberer = new ArrayNumberer();
+    ArrayNumberer<SparkField> fieldNumberer = new ArrayNumberer<SparkField>();
+    ArrayNumberer<SootClass> classNumberer = new ArrayNumberer<SootClass>();
     StringNumberer subSigNumberer = new StringNumberer();
-    ArrayNumberer localNumberer = new ArrayNumberer();
+    ArrayNumberer<Local> localNumberer = new ArrayNumberer<Local>();
 
     private Hierarchy activeHierarchy;
     private FastHierarchy activeFastHierarchy;
@@ -948,15 +949,15 @@ public class Scene  //extends AbstractHost
     {
         return getPhantomRefs();
     }
-    public Numberer kindNumberer() { return kindNumberer; }
-    public ArrayNumberer getTypeNumberer() { return typeNumberer; }
-    public ArrayNumberer getMethodNumberer() { return methodNumberer; }
+    public Numberer<Kind> kindNumberer() { return kindNumberer; }
+    public ArrayNumberer<Type> getTypeNumberer() { return typeNumberer; }
+    public ArrayNumberer<SootMethod> getMethodNumberer() { return methodNumberer; }
     public Numberer getContextNumberer() { return contextNumberer; }
-    public Numberer getUnitNumberer() { return unitNumberer; }
-    public ArrayNumberer getFieldNumberer() { return fieldNumberer; }
-    public ArrayNumberer getClassNumberer() { return classNumberer; }
+    public Numberer<Unit> getUnitNumberer() { return unitNumberer; }
+    public ArrayNumberer<SparkField> getFieldNumberer() { return fieldNumberer; }
+    public ArrayNumberer<SootClass> getClassNumberer() { return classNumberer; }
     public StringNumberer getSubSigNumberer() { return subSigNumberer; }
-    public ArrayNumberer getLocalNumberer() { return localNumberer; }
+    public ArrayNumberer<Local> getLocalNumberer() { return localNumberer; }
 
     public void setContextNumberer( Numberer n ) {
         if( contextNumberer != null )
@@ -1064,7 +1065,7 @@ public class Scene  //extends AbstractHost
         rn.add("to");
     }
 
-    private final Set<String>[] basicclasses=new Set[4];
+    private final Set<String>[] basicclasses = new Set[4];
 
     private void addSootBasicClasses() {
         basicclasses[SootClass.HIERARCHY] = new HashSet<String>();

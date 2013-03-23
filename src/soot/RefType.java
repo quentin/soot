@@ -36,7 +36,7 @@ import java.util.*;
  *   Two RefType are equal iff they are parametrized by the same class name as a String.
  */
 
-public class RefType extends RefLikeType implements Comparable
+public class RefType extends RefLikeType implements Comparable<Object>
 {
     public RefType( Singletons.Global g ) { className = ""; }
     public static RefType v() { return G.v().soot_RefType(); }

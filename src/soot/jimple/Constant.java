@@ -36,7 +36,7 @@ import java.util.*;
 
 public abstract class Constant implements Value, ConvertToBaf, Immediate
 {
-    public List getUseBoxes()
+    public List<ValueBox> getUseBoxes()
     {
         return AbstractUnit.emptyList;
     }
@@ -47,12 +47,12 @@ public abstract class Constant implements Value, ConvertToBaf, Immediate
         Unit u = Baf.v().newPushInst(this);
         out.add(u);
 
-        Iterator it = context.getCurrentUnit().getTags().iterator();
+        Iterator<Tag> it = context.getCurrentUnit().getTags().iterator();
 
-	while(it.hasNext()) 
+	      while(it.hasNext()) 
         {
-            u.addTag((Tag) it.next());
-	}
+          u.addTag(it.next());
+	      }
     }
 
     /** Clones the current constant.  Not implemented here. */

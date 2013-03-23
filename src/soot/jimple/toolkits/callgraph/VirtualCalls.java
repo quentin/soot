@@ -79,10 +79,10 @@ public final class VirtualCalls
 
     private final Map<Type,List<Type>> baseToSubTypes = new HashMap<Type,List<Type>>();
 
-    public void resolve( Type t, Type declaredType, NumberedString subSig, SootMethod container, ChunkedQueue targets ) {
+    public void resolve( Type t, Type declaredType, NumberedString subSig, SootMethod container, ChunkedQueue<SootMethod> targets ) {
         resolve(t, declaredType, null, subSig, container, targets);
     }
-    public void resolve( Type t, Type declaredType, Type sigType, NumberedString subSig, SootMethod container, ChunkedQueue targets ) {
+    public void resolve( Type t, Type declaredType, Type sigType, NumberedString subSig, SootMethod container, ChunkedQueue<SootMethod> targets ) {
         if( declaredType instanceof ArrayType ) declaredType = RefType.v("java.lang.Object");
         if( sigType instanceof ArrayType ) sigType = RefType.v("java.lang.Object");
         if( t instanceof ArrayType ) t = RefType.v( "java.lang.Object" );
@@ -100,16 +100,16 @@ public final class VirtualCalls
         } else if( t instanceof AnySubType ) {
             RefType base = ((AnySubType)t).getBase();
 
-            List subTypes = baseToSubTypes.get(base);
+            List<Type> subTypes = baseToSubTypes.get(base);
             if( subTypes != null ) {
-                for( Iterator stIt = subTypes.iterator(); stIt.hasNext(); ) {
-                    final Type st = (Type) stIt.next();
+                for( Iterator<Type> stIt = subTypes.iterator(); stIt.hasNext(); ) {
+                    final Type st = stIt.next();
                     resolve( st, declaredType, sigType, subSig, container, targets );
                 }
                 return;
             }
 
-            baseToSubTypes.put(base, subTypes = new ArrayList() );
+            baseToSubTypes.put(base, subTypes = new ArrayList<Type>() );
 
             subTypes.add(base);
 
@@ -122,8 +122,8 @@ public final class VirtualCalls
             while( !worklist.isEmpty() ) {
                 cl = worklist.removeFirst();
                 if( cl.isInterface() ) {
-                    for( Iterator cIt = fh.getAllImplementersOfInterface(cl).iterator(); cIt.hasNext(); ) {
-                        final SootClass c = (SootClass) cIt.next();
+                    for( Iterator<SootClass> cIt = fh.getAllImplementersOfInterface(cl).iterator(); cIt.hasNext(); ) {
+                        final SootClass c = cIt.next();
                         if( workset.add( c ) ) worklist.add( c );
                     }
                 } else {
@@ -131,8 +131,8 @@ public final class VirtualCalls
                         resolve( cl.getType(), declaredType, sigType, subSig, container, targets );
                         subTypes.add(cl.getType());
                     }
-                    for( Iterator cIt = fh.getSubclassesOf( cl ).iterator(); cIt.hasNext(); ) {
-                        final SootClass c = (SootClass) cIt.next();
+                    for( Iterator<SootClass> cIt = fh.getSubclassesOf( cl ).iterator(); cIt.hasNext(); ) {
+                        final SootClass c = cIt.next();
                         if( workset.add( c ) ) worklist.add( c );
                     }
                 }

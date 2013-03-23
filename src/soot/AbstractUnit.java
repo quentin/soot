@@ -45,7 +45,7 @@ public abstract class AbstractUnit extends AbstractHost implements Unit
      * Note that they are returned in usual evaluation order.
      * (this is important for aggregation)
      */
-    public List getUseBoxes()
+    public List<ValueBox> getUseBoxes()
     {
         return emptyList;
     }
@@ -53,7 +53,7 @@ public abstract class AbstractUnit extends AbstractHost implements Unit
     /** Returns a list of Boxes containing Values defined in this Unit.
      * The list of boxes is dynamically updated as the structure changes.
      */
-    public List getDefBoxes()
+    public List<ValueBox> getDefBoxes()
     {
         return emptyList;
     }
@@ -63,29 +63,30 @@ public abstract class AbstractUnit extends AbstractHost implements Unit
      * branch targets.
      * The list of boxes is dynamically updated as the structure changes.
      */
-    public List getUnitBoxes()
+    public List<UnitBox> getUnitBoxes()
     {
-        return emptyList;
+        return emptyUnitBoxesList;
     }
 
     /** Canonical AbstractUnit.emptyList list. */
-    static final public List emptyList = Collections.EMPTY_LIST;
-
+    static final public List<ValueBox> emptyList = Collections.emptyList();
+    static final public List<UnitBox> emptyUnitBoxesList = Collections.emptyList();
+    
     /** List of UnitBoxes pointing to this Unit. */
-    List boxesPointingToThis = null;
+    List<UnitBox> boxesPointingToThis = null;
 
     /** List of ValueBoxes contained in this Unit. */
-    List valueBoxes = null;
+    List<ValueBox> valueBoxes = null;
 
     /** Returns a list of Boxes pointing to this Unit. */
-    public List getBoxesPointingToThis()
+    public List<UnitBox> getBoxesPointingToThis()
     {
-        if( boxesPointingToThis == null ) return emptyList;
+        if( boxesPointingToThis == null ) return emptyUnitBoxesList;
         return Collections.unmodifiableList( boxesPointingToThis );
     }
 
     public void addBoxPointingToThis( UnitBox b ) {
-        if( boxesPointingToThis == null ) boxesPointingToThis = new ArrayList();
+        if( boxesPointingToThis == null ) boxesPointingToThis = new ArrayList<UnitBox>();
         boxesPointingToThis.add( b );
     }
 
@@ -94,17 +95,17 @@ public abstract class AbstractUnit extends AbstractHost implements Unit
     }
 
     public void clearUnitBoxes() {
-        for( Iterator it = getUnitBoxes().iterator(); it.hasNext(); ) {
-            UnitBox ub = (UnitBox) it.next();
+        for( Iterator<UnitBox> it = getUnitBoxes().iterator(); it.hasNext(); ) {
+            UnitBox ub = it.next();
             ub.setUnit(null);
         }
     }
     
     /** Returns a list of ValueBoxes, either used or defined in this Unit. */
-    public List getUseAndDefBoxes()
+    public List<ValueBox> getUseAndDefBoxes()
     {
-        List useBoxes = getUseBoxes();
-        List defBoxes = getDefBoxes();
+        List<ValueBox> useBoxes = getUseBoxes();
+        List<ValueBox> defBoxes = getDefBoxes();
         if( useBoxes.isEmpty() ) {
             if( defBoxes.isEmpty() ) {
                 return emptyList;
@@ -134,13 +135,12 @@ public abstract class AbstractUnit extends AbstractHost implements Unit
 
     public void redirectJumpsToThisTo(Unit newLocation)
     {
-        List boxesPointing = this.getBoxesPointingToThis();
+        List<UnitBox> boxesPointing = this.getBoxesPointingToThis();
 
-        Object[] boxes = boxesPointing.toArray();
+        UnitBox[] boxes = boxesPointing.<UnitBox>toArray(null);
         // important to change this to an array to have a static copy
         
-        for (Object element : boxes) {
-            UnitBox box = (UnitBox) element;
+        for (UnitBox box : boxes) {
 
             if(box.getUnit() != this)
                 throw new RuntimeException("Something weird's happening");

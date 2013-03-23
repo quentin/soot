@@ -45,7 +45,7 @@ import java.util.*;
  */
 public class SimpleLocalUses implements LocalUses
 {
-    Map<Unit, List> unitToUses;
+    Map<Unit, List<UnitValueBoxPair>> unitToUses;
 
     /**
      * Construct the analysis from a UnitGraph representation
@@ -79,16 +79,16 @@ public class SimpleLocalUses implements LocalUses
     
 	Chain units = body.getUnits();
 	
-        unitToUses = new HashMap<Unit, List>(units.size() * 2 + 1, 0.7f);
+        unitToUses = new HashMap<Unit, List<UnitValueBoxPair>>(units.size() * 2 + 1, 0.7f);
     
         // Initialize this map to empty sets
         {
-            Iterator it = units.iterator();
+            Iterator<Unit> it = units.iterator();
 
             while(it.hasNext())
             {
-                Unit s = (Unit) it.next();
-                unitToUses.put(s, new ArrayList());
+                Unit s = it.next();
+                unitToUses.put(s, new ArrayList<UnitValueBoxPair>());
             }
         }
 
@@ -100,17 +100,17 @@ public class SimpleLocalUses implements LocalUses
     
         // Traverse units and associate uses with definitions
         {
-            Iterator it = units.iterator();
+            Iterator<Unit> it = units.iterator();
 
             while(it.hasNext())
             {
-                Unit s = (Unit) it.next();
+                Unit s = it.next();
 
-                Iterator boxIt = s.getUseBoxes().iterator();
+                Iterator<ValueBox> boxIt = s.getUseBoxes().iterator();
 
                 while(boxIt.hasNext())
                 {
-                    ValueBox useBox = (ValueBox) boxIt.next();
+                    ValueBox useBox = boxIt.next();
 
                     if(useBox.getValue() instanceof Local)
                     {
@@ -139,11 +139,11 @@ public class SimpleLocalUses implements LocalUses
     
         // Store the map as a bunch of unmodifiable lists.
         {
-            Iterator it = units.iterator();
+            Iterator<Unit> it = units.iterator();
             
             while(it.hasNext())
             {
-                Unit s = (Unit) it.next();
+                Unit s = it.next();
 
                 unitToUses.put(s, Collections.unmodifiableList(unitToUses.get(s)));
             }
@@ -168,9 +168,9 @@ public class SimpleLocalUses implements LocalUses
      *  @param s a unit that we want to query for the uses of the Local it (may) define.
      *  @return a UnitValueBoxPair of the Units that use the Local.
      */
-    public List getUsesOf(Unit s)
+    public List<UnitValueBoxPair> getUsesOf(Unit s)
     {
-        List l = unitToUses.get(s);
+        List<UnitValueBoxPair> l = unitToUses.get(s);
 
         return l;
     }

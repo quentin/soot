@@ -46,7 +46,7 @@ public class Aggregator extends BodyTransformer
       * 
       * option: only-stack-locals; if this is true, only aggregate variables
                         starting with $ */
-    protected void internalTransform(Body b, String phaseName, Map options)
+    protected void internalTransform(Body b, String phaseName, Map<String,String> options)
     {
         StmtBody body = (StmtBody)b;
         boolean onlyStackVars = PhaseOptions.getBoolean(options, "only-stack-locals"); 
@@ -63,23 +63,23 @@ public class Aggregator extends BodyTransformer
         {
             Zonation zonation = new Zonation(body);
             
-            Iterator unitIt = body.getUnits().iterator();
+            Iterator<Unit> unitIt = body.getUnits().iterator();
             
             while(unitIt.hasNext())
             {
-                Unit u = (Unit) unitIt.next();
+                Unit u = unitIt.next();
                 Zone zone = zonation.getZoneOf(u);
                 
-                Iterator boxIt = u.getUseBoxes().iterator();
+                Iterator<ValueBox> boxIt = u.getUseBoxes().iterator();
                 while(boxIt.hasNext())
                 {
-                    ValueBox box = (ValueBox) boxIt.next();                    
+                    ValueBox box = boxIt.next();                    
                     boxToZone.put(box, zone);
                 }   
                 boxIt = u.getDefBoxes().iterator();
                 while(boxIt.hasNext())
                 {
-                    ValueBox box = (ValueBox) boxIt.next();                    
+                    ValueBox box = boxIt.next();                    
                     boxToZone.put(box, zone);
                 }   
             }
@@ -104,18 +104,18 @@ public class Aggregator extends BodyTransformer
   
   private static boolean internalAggregate(StmtBody body, Map<ValueBox, Zone> boxToZone, boolean onlyStackVars)
     {
-      Iterator stmtIt;
+      Iterator<Unit> stmtIt;
       LocalUses localUses;
       LocalDefs localDefs;
       ExceptionalUnitGraph graph;
       boolean hadAggregation = false;
-      Chain units = body.getUnits();
+      Chain<Unit> units = body.getUnits();
       
       graph = new ExceptionalUnitGraph(body);
       localDefs = new SmartLocalDefs(graph, new SimpleLiveLocals(graph));
       localUses = new SimpleLocalUses(graph, localDefs);
           
-      stmtIt = (new PseudoTopologicalOrderer()).newList(graph,false).iterator();
+      stmtIt = (new PseudoTopologicalOrderer<Unit>()).newList(graph,false).iterator();
       
       while (stmtIt.hasNext())
         {
@@ -131,7 +131,7 @@ public class Aggregator extends BodyTransformer
           if(onlyStackVars && !((Local) lhs).getName().startsWith("$"))
             continue;
             
-          List lu = localUses.getUsesOf(s);
+          List<UnitValueBoxPair> lu = localUses.getUsesOf(s);
           if (lu.size() != 1)
             continue;
             
@@ -164,10 +164,10 @@ public class Aggregator extends BodyTransformer
           ArrayList<Value> fieldRefList = new ArrayList<Value>();
       
           LinkedList<Value> localsUsed = new LinkedList<Value>();
-          for (Iterator useIt = (s.getUseBoxes()).iterator();
+          for (Iterator<ValueBox> useIt = (s.getUseBoxes()).iterator();
                useIt.hasNext(); )
             {
-              Value v = ((ValueBox)(useIt.next())).getValue();
+              Value v = useIt.next().getValue();
                 if (v instanceof Local)
                     localsUsed.add(v);
                 else if (v instanceof InvokeExpr)
@@ -203,10 +203,10 @@ public class Aggregator extends BodyTransformer
               {
                 // Check for killing definitions
                 
-                for (Iterator it = between.getDefBoxes().iterator();
+                for (Iterator<ValueBox> it = between.getDefBoxes().iterator();
                        it.hasNext(); )
                   {
-                      Value v = ((ValueBox)(it.next())).getValue();
+                      Value v = it.next().getValue();
                       if (localsUsed.contains(v))
                       { 
                             cantAggr = true; 
@@ -268,8 +268,8 @@ public class Aggregator extends BodyTransformer
               // Check for intervening side effects due to method calls
                 if(propagatingInvokeExpr || propagatingFieldRef || propagatingArrayRef)
                     {
-                      for( Iterator boxIt = (between.getUseBoxes()).iterator(); boxIt.hasNext(); ) {
-                          final ValueBox box = (ValueBox) boxIt.next();
+                      for( Iterator<ValueBox> boxIt = (between.getUseBoxes()).iterator(); boxIt.hasNext(); ) {
+                          final ValueBox box = boxIt.next();
                           
                           if(between == use && box == useBox)
                           {

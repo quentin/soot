@@ -23,6 +23,7 @@ import soot.util.*;
 import java.util.*;
 import soot.jimple.toolkits.callgraph.*;
 import soot.jimple.*;
+import soot.jimple.spark.pag.SparkField;
 
 public class FieldTagger extends BodyTransformer
 { 
@@ -38,7 +39,7 @@ public class FieldTagger extends BodyTransformer
         processedMethods.add(m);
         if( !m.isConcrete() ) return;
         if( m.isPhantom() ) return;
-        for( Iterator sIt = m.retrieveActiveBody().getUnits().iterator(); sIt.hasNext(); ) {
+        for( Iterator<Unit> sIt = m.retrieveActiveBody().getUnits().iterator(); sIt.hasNext(); ) {
             final Stmt s = (Stmt) sIt.next();
             if( s instanceof AssignStmt ) {
                 AssignStmt as = (AssignStmt) s;
@@ -53,7 +54,7 @@ public class FieldTagger extends BodyTransformer
             }
         }
     }
-    protected void internalTransform(Body body, String phaseName, Map options)
+    protected void internalTransform(Body body, String phaseName, Map<String,String> options)
     {
         int threshold = PhaseOptions.getInt( options, "threshold" );
 
@@ -61,9 +62,9 @@ public class FieldTagger extends BodyTransformer
 
         CallGraph cg = Scene.v().getCallGraph();
         TransitiveTargets tt = new TransitiveTargets( cg );
-statement: for( Iterator sIt = body.getUnits().iterator(); sIt.hasNext(); ) {     final Stmt s = (Stmt) sIt.next();
-            HashSet read = new HashSet();
-            HashSet write = new HashSet();
+statement: for( Iterator<Unit> sIt = body.getUnits().iterator(); sIt.hasNext(); ) {     final Stmt s = (Stmt) sIt.next();
+            HashSet<SparkField> read = new HashSet<SparkField>();
+            HashSet<SparkField> write = new HashSet<SparkField>();
             Iterator<MethodOrMethodContext> it = tt.iterator( s );
             while( it.hasNext() ) {
                 SootMethod target = (SootMethod) it.next();

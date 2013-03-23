@@ -66,18 +66,18 @@ public class AttributesUnitPrinter {
     }
 
 	private boolean hasTag(Host h) {
-        if (h instanceof Unit) {
-            Iterator usesAndDefsIt = ((Unit)h).getUseAndDefBoxes().iterator();
-            while (usesAndDefsIt.hasNext()){
-                if (hasTag((ValueBox)usesAndDefsIt.next())) return true;
-            }
+    if (h instanceof Unit) {
+      Iterator<ValueBox> usesAndDefsIt = ((Unit)h).getUseAndDefBoxes().iterator();
+      while (usesAndDefsIt.hasNext()){
+        if (hasTag(usesAndDefsIt.next())) return true;
         }
+      }
 		if (h.getTags().isEmpty()) return false;
 		return true;
 	}
 	
 	private boolean hasColorTag(Host h) {
-		Iterator it = h.getTags().iterator();
+		Iterator<Tag> it = h.getTags().iterator();
 		while (it.hasNext()){
 			if (it.next() instanceof ColorTag) return true;
 		}

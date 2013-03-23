@@ -72,7 +72,7 @@ public class Options extends OptionsBase {
     public static final int throw_analysis_unit = 2;
 
     public boolean parse( String[] argv ) {
-        LinkedList phaseOptions = new LinkedList();
+        LinkedList<String> phaseOptions = new LinkedList<String>();
 
         for( int i = argv.length; i > 0; i-- ) {
             pushOptions( argv[i-1] );
@@ -111,7 +111,7 @@ public class Options extends OptionsBase {
                 String value = nextOption();
     
                 if( phase_help == null )
-                    phase_help = new LinkedList();
+                    phase_help = new LinkedList<String>();
 
                 phase_help.add( value );
             }
@@ -205,7 +205,7 @@ public class Options extends OptionsBase {
                 String value = nextOption();
     
                 if( process_dir == null )
-                    process_dir = new LinkedList();
+                    process_dir = new LinkedList<String>();
 
                 process_dir.add( value );
             }
@@ -620,7 +620,7 @@ public class Options extends OptionsBase {
                 String value = nextOption();
     
                 if( dump_body == null )
-                    dump_body = new LinkedList();
+                    dump_body = new LinkedList<String>();
 
                 dump_body.add( value );
             }
@@ -635,7 +635,7 @@ public class Options extends OptionsBase {
                 String value = nextOption();
     
                 if( dump_cfg == null )
-                    dump_cfg = new LinkedList();
+                    dump_cfg = new LinkedList<String>();
 
                 dump_cfg.add( value );
             }
@@ -792,7 +792,7 @@ public class Options extends OptionsBase {
                 String value = nextOption();
     
                 if( include == null )
-                    include = new LinkedList();
+                    include = new LinkedList<String>();
 
                 include.add( value );
             }
@@ -808,7 +808,7 @@ public class Options extends OptionsBase {
                 String value = nextOption();
     
                 if( exclude == null )
-                    exclude = new LinkedList();
+                    exclude = new LinkedList<String>();
 
                 exclude.add( value );
             }
@@ -828,7 +828,7 @@ public class Options extends OptionsBase {
                 String value = nextOption();
     
                 if( dynamic_class == null )
-                    dynamic_class = new LinkedList();
+                    dynamic_class = new LinkedList<String>();
 
                 dynamic_class.add( value );
             }
@@ -843,7 +843,7 @@ public class Options extends OptionsBase {
                 String value = nextOption();
     
                 if( dynamic_dir == null )
-                    dynamic_dir = new LinkedList();
+                    dynamic_dir = new LinkedList<String>();
 
                 dynamic_dir.add( value );
             }
@@ -858,7 +858,7 @@ public class Options extends OptionsBase {
                 String value = nextOption();
     
                 if( dynamic_package == null )
-                    dynamic_package = new LinkedList();
+                    dynamic_package = new LinkedList<String>();
 
                 dynamic_package.add( value );
             }
@@ -956,10 +956,10 @@ public class Options extends OptionsBase {
             }
         }
 
-        Iterator it = phaseOptions.iterator();
+        Iterator<String> it = phaseOptions.iterator();
         while( it.hasNext() ) {
-            String phaseName = (String) it.next();
-            String phaseOption = (String) it.next();
+            String phaseName = it.next();
+            String phaseOption = it.next();
             if( !setPhaseOption( phaseName, "enabled:true" ) ) return false;
         }
 

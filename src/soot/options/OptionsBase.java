@@ -70,8 +70,8 @@ abstract class OptionsBase {
         b.append( "\nPhases and phase options:\n" );
         for (Pack p : PackManager.v().allPacks()) {
             b.append( padOpt( p.getPhaseName(), p.getDeclaredOptions() ) );
-            for( Iterator phIt = p.iterator(); phIt.hasNext(); ) {
-                final HasPhaseOptions ph = (HasPhaseOptions) phIt.next();
+            for( Iterator<Transform> phIt = p.iterator(); phIt.hasNext(); ) {
+                final HasPhaseOptions ph = phIt.next();
                 b.append( padVal( ph.getPhaseName(), ph.getDeclaredOptions() ) );
             }
         }
