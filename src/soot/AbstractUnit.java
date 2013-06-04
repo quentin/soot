@@ -116,7 +116,7 @@ public abstract class AbstractUnit extends AbstractHost implements Unit
             if( defBoxes.isEmpty() ) {
                 return Collections.unmodifiableList(useBoxes);
             } else {
-                valueBoxes = new ArrayList();
+                valueBoxes = new ArrayList<ValueBox>();
 
                 valueBoxes.addAll(defBoxes);
                 valueBoxes.addAll(useBoxes);
@@ -137,7 +137,7 @@ public abstract class AbstractUnit extends AbstractHost implements Unit
     {
         List<UnitBox> boxesPointing = this.getBoxesPointingToThis();
 
-        UnitBox[] boxes = boxesPointing.<UnitBox>toArray(null);
+        UnitBox[] boxes = boxesPointing.<UnitBox>toArray(new UnitBox[0]);
         // important to change this to an array to have a static copy
         
         for (UnitBox box : boxes) {
