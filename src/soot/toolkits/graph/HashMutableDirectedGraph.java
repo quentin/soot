@@ -42,11 +42,11 @@ import soot.util.*;
 public class HashMutableDirectedGraph<N> implements MutableDirectedGraph<N> {
 		
 
-    protected HashMap<N,LinkedHashSet<N>> nodeToPreds = new HashMap();
-    protected HashMap<N,LinkedHashSet<N>> nodeToSuccs = new HashMap();
+    protected HashMap<N,LinkedHashSet<N>> nodeToPreds = new HashMap<N,LinkedHashSet<N>>();
+    protected HashMap<N,LinkedHashSet<N>> nodeToSuccs = new HashMap<N,LinkedHashSet<N>>();
 
-    protected Chain heads = new HashChain();
-    protected Chain tails = new HashChain();
+    protected Chain<N> heads = new HashChain<N>();
+    protected Chain<N> tails = new HashChain<N>();
 
     public HashMutableDirectedGraph()
     {
@@ -54,40 +54,40 @@ public class HashMutableDirectedGraph<N> implements MutableDirectedGraph<N> {
 
     /** Removes all nodes and edges. */
     public void clearAll() {
-        nodeToPreds = new HashMap();
-        nodeToSuccs = new HashMap();
-        heads = new HashChain();
-        tails = new HashChain();
+        nodeToPreds = new HashMap<N,LinkedHashSet<N>>();
+        nodeToSuccs = new HashMap<N,LinkedHashSet<N>>();
+        heads = new HashChain<N>();
+        tails = new HashChain<N>();
     }
 
     public Object clone() {
-        HashMutableDirectedGraph g = new HashMutableDirectedGraph();
-        g.nodeToPreds = (HashMap)nodeToPreds.clone();
-        g.nodeToSuccs = (HashMap)nodeToSuccs.clone();
+        HashMutableDirectedGraph<N> g = new HashMutableDirectedGraph<N>();
+        g.nodeToPreds = (HashMap<N,LinkedHashSet<N>>)nodeToPreds.clone();
+        g.nodeToSuccs = (HashMap<N,LinkedHashSet<N>>)nodeToSuccs.clone();
         g.heads = HashChain.listToHashChain(HashChain.toList(heads));
         g.tails = HashChain.listToHashChain(HashChain.toList(tails));
         return g;
     }
 
     /* Returns an unbacked list of heads for this graph. */
-    public List getHeads()
+    public List<N> getHeads()
     {
-        ArrayList l = new ArrayList(); l.addAll(heads);
-        return Collections.unmodifiableList(l);
+        ArrayList<N> l = new ArrayList<N>(); l.addAll(heads);
+        return Collections.<N>unmodifiableList(l);
     }
 
     /* Returns an unbacked list of tails for this graph. */
-    public List getTails()
+    public List<N> getTails()
     {
-        ArrayList l = new ArrayList(); l.addAll(tails);
-        return Collections.unmodifiableList(l);
+        ArrayList<N> l = new ArrayList<N>(); l.addAll(tails);
+        return Collections.<N>unmodifiableList(l);
     }
 
-    public List getPredsOf(N s)
+    public List<N> getPredsOf(N s)
     {
-        Set preds = nodeToPreds.get(s);
+        Set<N> preds = nodeToPreds.get(s);
         if (preds != null)
-            return new LinkedList(preds);
+            return new LinkedList<N>(preds);
         else
             throw new RuntimeException(s+"not in graph!");
     }
@@ -99,20 +99,20 @@ public class HashMutableDirectedGraph<N> implements MutableDirectedGraph<N> {
      * execute faster on the set than on the list.
      * The returned set is unmodifiable. 
      */
-    public Set getPredsOfAsSet(N s)
+    public Set<N> getPredsOfAsSet(N s)
     {
-        Set preds = nodeToPreds.get(s);
+        Set<N> preds = nodeToPreds.get(s);
         if (preds != null)
-            return Collections.unmodifiableSet(preds);
+            return Collections.<N>unmodifiableSet(preds);
         else
             throw new RuntimeException(s+"not in graph!");
     }
 
-    public List getSuccsOf(N s)
+    public List<N> getSuccsOf(N s)
     {
-        Set succs = nodeToSuccs.get(s);
+        Set<N> succs = nodeToSuccs.get(s);
         if (succs != null)
-            return new LinkedList(succs);
+            return new LinkedList<N>(succs);
         else
             throw new RuntimeException(s+"not in graph!");
     }
@@ -124,11 +124,11 @@ public class HashMutableDirectedGraph<N> implements MutableDirectedGraph<N> {
      * execute faster on the set than on the list.
      * The returned set is unmodifiable. 
      */
-    public Set getSuccsOfAsSet(N s)
+    public Set<N> getSuccsOfAsSet(N s)
     {
-        Set succs = nodeToSuccs.get(s);
+        Set<N> succs = nodeToSuccs.get(s);
         if (succs != null)
-            return Collections.unmodifiableSet(succs);
+            return Collections.<N>unmodifiableSet(succs);
         else
             throw new RuntimeException(s+"not in graph!");
     }
@@ -139,7 +139,7 @@ public class HashMutableDirectedGraph<N> implements MutableDirectedGraph<N> {
         return nodeToPreds.keySet().size();
     }
 
-    public Iterator iterator()
+    public Iterator<N> iterator()
     {
         return nodeToPreds.keySet().iterator();
     }
@@ -175,11 +175,11 @@ public class HashMutableDirectedGraph<N> implements MutableDirectedGraph<N> {
         if (!containsEdge(from, to))
             return;
 
-        Set succsList = nodeToSuccs.get(from);
+        Set<N> succsList = nodeToSuccs.get(from);
         if (succsList == null)
             throw new RuntimeException(from + " not in graph!");
 
-        Set predsList = nodeToPreds.get(to);
+        Set<N> predsList = nodeToPreds.get(to);
         if (predsList == null)
             throw new RuntimeException(to + " not in graph!");
 
@@ -195,7 +195,7 @@ public class HashMutableDirectedGraph<N> implements MutableDirectedGraph<N> {
 
     public boolean containsEdge(N from, N to)
     {
-    		Set succs = nodeToSuccs.get(from);
+    		Set<N> succs = nodeToSuccs.get(from);
 				if (succs == null)
 						return false;
         return succs.contains(to);
@@ -224,12 +224,12 @@ public class HashMutableDirectedGraph<N> implements MutableDirectedGraph<N> {
 
     public void removeNode(N node)
     {
-    	LinkedHashSet succs = (LinkedHashSet)nodeToSuccs.get(node).clone();
+    	LinkedHashSet<N> succs = (LinkedHashSet<N>)nodeToSuccs.get(node).clone();
         for (Iterator<N> succsIt = succs.iterator(); succsIt.hasNext(); )
             removeEdge(node, succsIt.next());
         nodeToSuccs.remove(node);
 
-        LinkedHashSet preds = (LinkedHashSet)nodeToPreds.get(node).clone();
+        LinkedHashSet<N> preds = (LinkedHashSet<N>)nodeToPreds.get(node).clone();
         for (Iterator<N> predsIt = preds.iterator(); predsIt.hasNext(); )
             removeEdge(predsIt.next(), node);
         nodeToPreds.remove(node);
@@ -247,12 +247,12 @@ public class HashMutableDirectedGraph<N> implements MutableDirectedGraph<N> {
 	    N node = it.next();
 	    G.v().out.println("Node = "+node);
 	    G.v().out.println("Preds:");
-	    for (Iterator predsIt = getPredsOf(node).iterator(); predsIt.hasNext(); ) {
+	    for (Iterator<N> predsIt = getPredsOf(node).iterator(); predsIt.hasNext(); ) {
 		G.v().out.print("     ");
 		G.v().out.println(predsIt.next());
 	    }
 	    G.v().out.println("Succs:");
-	    for (Iterator succsIt = getSuccsOf(node).iterator(); succsIt.hasNext(); ) {
+	    for (Iterator<N> succsIt = getSuccsOf(node).iterator(); succsIt.hasNext(); ) {
 		G.v().out.print("     ");
 		G.v().out.println(succsIt.next());
 	    }
