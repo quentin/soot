@@ -28,13 +28,19 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
+import soot.G;
+import soot.Singletons;
 import soot.SootClass;
 import soot.SootResolver;
 import soot.javaToJimple.IInitialResolver.Dependencies;
 
 public class DexResolver {
 	
-	private static Map<File,DexlibWrapper> cache = new TreeMap<File, DexlibWrapper>();
+	private Map<File,DexlibWrapper> cache = new TreeMap<File, DexlibWrapper>();
+	
+    public DexResolver(Singletons.Global g) {}
+
+    public static DexResolver v() { return G.v().soot_dexpler_DexResolver(); }
 	
     /**
      * Resolve the class contained in file into the passed soot class.
@@ -44,7 +50,7 @@ public class DexResolver {
      * @param sc the soot class that will represent the class
      * @return the dependencies of this class.
      */
-    public static Dependencies resolveFromFile(File file, String className, SootClass sc) {
+    public Dependencies resolveFromFile(File file, String className, SootClass sc) {
     	DexlibWrapper wrapper = cache.get(file);
     	if(wrapper==null) {
     		wrapper = new DexlibWrapper(file);
@@ -85,10 +91,22 @@ public class DexResolver {
             sc.addMethod(m.toSoot());
         }
 
+        addSourceFileTag(sc, file.getAbsolutePath());
         return deps;
     }
 
-	public static void reset() {
-		cache.clear();
-	}
+    /**
+     *  adds source file tag to each sootclass
+     */
+    protected static void addSourceFileTag(SootClass sc, String fileName){
+        soot.tagkit.SourceFileTag tag = null;
+        if (sc.hasTag("SourceFileTag")) {
+            tag = (soot.tagkit.SourceFileTag)sc.getTag("SourceFileTag");
+        }
+        else {
+            tag = new soot.tagkit.SourceFileTag();
+            sc.addTag(tag);
+        }
+        tag.setSourceFile(fileName); 
+    }
 }

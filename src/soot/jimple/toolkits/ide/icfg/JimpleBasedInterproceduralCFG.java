@@ -67,7 +67,7 @@ public class JimpleBasedInterproceduralCFG implements InterproceduralCFG<Unit,So
 		protected EdgeFilter() {
 			super(new EdgePredicate() {
 				public boolean want(Edge e) {				
-					return e.kind().isExplicit() || e.kind().isThread();
+					return e.kind().isExplicit() || e.kind().isThread() || e.kind().isClinit();
 				}
 			});
 		}
@@ -126,11 +126,9 @@ public class JimpleBasedInterproceduralCFG implements InterproceduralCFG<Unit,So
 			IDESolver.DEFAULT_CACHE_BUILDER.build( new CacheLoader<SootMethod,Set<Unit>>() {
 				public Set<Unit> load(SootMethod m) throws Exception {
 					Set<Unit> res = new LinkedHashSet<Unit>();
-					//only retain calls that are explicit call sites or Thread.start()
-					Iterator<Edge> edgeIter = new EdgeFilter().wrap(cg.edgesOutOf(m));
-					while(edgeIter.hasNext()) {
-						Edge edge = edgeIter.next();
-						res.add(edge.srcUnit());			
+					for(Unit u: m.getActiveBody().getUnits()) {
+						if(isCallStmt(u))
+							res.add(u);
 					}
 					return res;
 				}
@@ -157,6 +155,7 @@ public class JimpleBasedInterproceduralCFG implements InterproceduralCFG<Unit,So
 
 	@Override
 	public SootMethod getMethodOf(Unit u) {
+		assert unitToOwner.containsKey(u);
 		return unitToOwner.get(u).getMethod();
 	}
 
