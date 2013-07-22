@@ -1,10 +1,10 @@
 /* Soot - a Java Optimization Framework
  * Copyright (C) 2012 Michael Markert, Frank Hartmann
- * 
+ *
  * (c) 2012 University of Luxembourg - Interdisciplinary Centre for
  * Security Reliability and Trust (SnT) - All rights reserved
  * Alexandre Bartel
- * 
+ *
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,17 +31,16 @@ import java.util.TreeMap;
 import soot.G;
 import soot.Singletons;
 import soot.SootClass;
-import soot.SootResolver;
 import soot.javaToJimple.IInitialResolver.Dependencies;
 
 public class DexResolver {
-	
+
 	private Map<File,DexlibWrapper> cache = new TreeMap<File, DexlibWrapper>();
-	
+
     public DexResolver(Singletons.Global g) {}
 
     public static DexResolver v() { return G.v().soot_dexpler_DexResolver(); }
-	
+
     /**
      * Resolve the class contained in file into the passed soot class.
      *
@@ -57,41 +56,10 @@ public class DexResolver {
     		cache.put(file, wrapper);
     		wrapper.initialize();
     	}
-        DexClass c = wrapper.getClass(className);
-        if (c == null)
-            throw new RuntimeException("Class " + className + " not found at " + file.getPath());
 
-        sc.setModifiers(c.getModifiers());
-        Dependencies deps = new Dependencies();
-        // interfaces for hierarchy level
-        for (String interfaceName : c.getInterfaces()) {
-            String interfaceClassName = Util.dottedClassName(interfaceName);
-            SootClass interfaceClass = SootResolver.v().makeClassRef(interfaceClassName);
-            sc.addInterface(interfaceClass);
-            deps.typesToHierarchy.add(interfaceClass.getType());
-        }
-        // super class for hierarchy level
-        String superClassName = Util.dottedClassName(c.getSuperclass());
-        SootClass superClass = SootResolver.v().makeClassRef(superClassName);
-        sc.setSuperclass(superClass);
-        deps.typesToHierarchy.add(superClass.getType());
-
-        // all types for signature level
-        for (DexType t : c.getAllTypes()) {
-            deps.typesToSignature.add(t.toSoot());
-        }
-
-        // fields
-        for (DexField f : c.getDeclaredFields()) {
-            sc.addField(f.toSoot());
-        }
-
-        // methods
-        for (DexMethod m : c.getDeclaredMethods()) {
-            sc.addMethod(m.toSoot());
-        }
-
+        Dependencies deps = wrapper.makeSootClass(sc, className);
         addSourceFileTag(sc, file.getAbsolutePath());
+
         return deps;
     }
 
@@ -107,6 +75,6 @@ public class DexResolver {
             tag = new soot.tagkit.SourceFileTag();
             sc.addTag(tag);
         }
-        tag.setSourceFile(fileName); 
+        tag.setSourceFile(fileName);
     }
 }
