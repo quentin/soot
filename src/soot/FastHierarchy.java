@@ -32,9 +32,15 @@ import java.util.*;
  */
 public class FastHierarchy
 {
-    private static <K,V> void put( Map<K, List<V>> m, K key, V value ) {
-        List<V> l = m.get( key );
-        if( l == null ) m.put( key, l = new ArrayList<V>() );
+//<<<<<<< HEAD
+//    private static <K,V> void put( Map<K, List<V>> m, K key, V value ) {
+//        List<V> l = m.get( key );
+//        if( l == null ) m.put( key, l = new ArrayList<V>() );
+//=======
+    private static void put( Map<SootClass, List<SootClass>> m, SootClass key, SootClass value ) {
+        List<SootClass> l = m.get( key );
+        if( l == null ) m.put( key, l = new ArrayList<SootClass>() );
+//>>>>>>> develop
         l.add( value );
     }
     
@@ -69,10 +75,6 @@ public class FastHierarchy
      * a pair of numbers giving a preorder and postorder ordering of classes
      * in the inheritance tree. */
     protected Map<SootClass, Interval> classToInterval = new HashMap<SootClass, Interval>();
-
-    /** These maps cache subtype queries, so they can be re-done quickly. */
-    //protected MultiMap cacheSubtypes = new HashMultiMap();
-    //protected MultiMap cacheNonSubtypes = new HashMultiMap();
 
     protected Scene sc;
 
@@ -168,8 +170,10 @@ public class FastHierarchy
         return interfaceToAllImplementers.get( parent );
     }
 
-    /** For an interface parent (MUST be an interface), returns set of all
-     * subinterfaces. */
+    /**
+     * For an interface parent (MUST be an interface), returns set of all subinterfaces.
+     * @param parent the parent interface.
+     * */
     protected Set<SootClass> getAllSubinterfaces( SootClass parent ) {
         parent.checkLevel(SootClass.HIERARCHY);
         if( !interfaceToAllSubinterfaces.containsKey( parent ) ) {
@@ -181,21 +185,6 @@ public class FastHierarchy
         }
         return interfaceToAllSubinterfaces.get( parent );
     }
-
-    /** Given an object of declared type child, returns true if the object
-     * can be stored in a variable of type parent. If child is an interface
-     * that is not a subinterface of parent, this method will return false
-     * even though some objects implementing the child interface may also
-     * implement the parent interface. */
-    /*
-    public boolean canStoreType( Type child, Type parent ) {
-        if( cacheSubtypes.get( parent ).contains( child ) ) return true;
-        if( cacheNonSubtypes.get( parent ).contains( child ) ) return false;
-        boolean ret = canStoreTypeInternal( child, parent );
-        ( ret ? cacheSubtypes : cacheNonSubtypes ).put( parent, child );
-        return ret;
-    }
-    */
 
     /** Given an object of declared type child, returns true if the object
      * can be stored in a variable of type parent. If child is an interface
@@ -513,6 +502,11 @@ public class FastHierarchy
             return target;
     }
 
+  /**
+   * Gets the direct subclasses of a given class. The class needs to be resolved at least at the HIERARCHY level.
+   * @param c the class
+   * @return a collection (possibly empty) of the direct subclasses
+   */
     public Collection<SootClass> getSubclassesOf( SootClass c ) {
         c.checkLevel(SootClass.HIERARCHY);
         Collection<SootClass> ret = classToSubclasses.get(c);
