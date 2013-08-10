@@ -39,8 +39,6 @@ class FutureStmt extends soot.jimple.internal.AbstractStmt
 {
     public Object object;
 
-    List myEmptyList = Collections.unmodifiableList(new ArrayList());
-
     public FutureStmt(Object object)
     {
         this.object = object;
@@ -59,19 +57,19 @@ class FutureStmt extends soot.jimple.internal.AbstractStmt
         up.literal("<futurestmt>");
     }
 
-    public List getDefBoxes()
+    public List<ValueBox> getDefBoxes()
     {
-        return myEmptyList;
+        return Collections.<ValueBox>emptyList();
     }
 
-    public List getUseBoxes()
+    public List<ValueBox> getUseBoxes()
     {
-        return myEmptyList;
+        return Collections.<ValueBox>emptyList();
     }
 
-    public List getUnitBoxes()
+    public List<UnitBox> getUnitBoxes()
     {
-        return myEmptyList;
+        return Collections.<UnitBox>emptyList();
     }
 
     public void apply(Switch sw)
