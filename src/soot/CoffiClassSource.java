@@ -44,7 +44,7 @@ public class CoffiClassSource extends ClassSource
         if(Options.v().verbose())
             G.v().out.println("resolving [from .class]: " + className );
         List references = new ArrayList();
-        soot.coffi.Util.v().resolveFromClassFile(sc, classFile, references);
+        soot.coffi.Util.v().resolveFromClassFile(sc, classFile, fileName, references);
 
         try {
             classFile.close();
@@ -70,7 +70,7 @@ public class CoffiClassSource extends ClassSource
             sc.addTag(tag);
         }
         
-        String name = zipFileName == null ? fileName : zipFileName;
+        String name = zipFileName == null ? new File(fileName).getName() : zipFileName;
         tag.setSourceFile(name); 
     }
 }

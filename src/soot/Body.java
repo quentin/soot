@@ -238,7 +238,7 @@ public abstract class Body extends AbstractHost implements Serializable
         }
     }
 
-    /** Verifies that a ValueBox is not used in more than one place. */
+	/** Verifies that a ValueBox is not used in more than one place. */
     public void validateValueBoxes()
     {
         List<ValueBox> l = getUseAndDefBoxes();

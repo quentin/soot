@@ -116,22 +116,22 @@ public class Scene  //extends AbstractHost
 	}
     public static Scene  v() { return G.v().soot_Scene (); }
     
-    Chain<SootClass> classes = new HashChain<SootClass>();
-    Chain<SootClass> applicationClasses = new HashChain<SootClass>();
-    Chain<SootClass> libraryClasses = new HashChain<SootClass>();
-    Chain<SootClass> phantomClasses = new HashChain<SootClass>();
+    private Chain<SootClass> classes = new HashChain<SootClass>();
+    private Chain<SootClass> applicationClasses = new HashChain<SootClass>();
+    private Chain<SootClass> libraryClasses = new HashChain<SootClass>();
+    private Chain<SootClass> phantomClasses = new HashChain<SootClass>();
     
     private final Map<String,Type> nameToClass = new HashMap<String,Type>();
 
-    ArrayNumberer<Kind> kindNumberer = new ArrayNumberer<Kind>();
-    ArrayNumberer<Type> typeNumberer = new ArrayNumberer<Type>();
-    ArrayNumberer<SootMethod> methodNumberer = new ArrayNumberer<SootMethod>();
-    Numberer<Unit> unitNumberer = new MapNumberer<Unit>();
-    Numberer<Context> contextNumberer = null;
-    ArrayNumberer<SparkField> fieldNumberer = new ArrayNumberer<SparkField>();
-    ArrayNumberer<SootClass> classNumberer = new ArrayNumberer<SootClass>();
-    StringNumberer subSigNumberer = new StringNumberer();
-    ArrayNumberer<Local> localNumberer = new ArrayNumberer<Local>();
+    private ArrayNumberer<Kind> kindNumberer = new ArrayNumberer<Kind>();
+    private ArrayNumberer<Type> typeNumberer = new ArrayNumberer<Type>();
+    private ArrayNumberer<SootMethod> methodNumberer = new ArrayNumberer<SootMethod>();
+    private Numberer<Unit> unitNumberer = new MapNumberer<Unit>();
+    private Numberer<Context> contextNumberer = null;
+    private ArrayNumberer<SparkField> fieldNumberer = new ArrayNumberer<SparkField>();
+    private ArrayNumberer<SootClass> classNumberer = new ArrayNumberer<SootClass>();
+    private StringNumberer subSigNumberer = new StringNumberer();
+    private ArrayNumberer<Local> localNumberer = new ArrayNumberer<Local>();
 
     private Hierarchy activeHierarchy;
     private FastHierarchy activeFastHierarchy;
@@ -604,11 +604,9 @@ public class Scene  //extends AbstractHost
             Main.v().resolveTimer.start();
         */
         
-        setPhantomRefs(true);
         //SootResolver resolver = new SootResolver();
         SootResolver resolver = SootResolver.v();
         SootClass toReturn = resolver.resolveClass(className, desiredLevel);
-        setPhantomRefs(false);
 
         return toReturn;
         
